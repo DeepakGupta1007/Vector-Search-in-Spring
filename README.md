@@ -34,6 +34,12 @@ Use the included Maven wrapper to start the application:
 ```
 *Note: The first run may take a few minutes to download the embedding model.*
 
+## Web UI
+You can interact with the application directly through the built-in Web Interface.
+1.  Open your browser and navigate to: `http://localhost:8081`
+2.  Use the **Add to Knowledge Base** section to save text with a User ID.
+3.  Use the **Search Engine** section to find relevant documents using natural language.
+
 ## API Usage
 
 ### Save Data
@@ -64,3 +70,4 @@ View the request/response logs locally.
 curl http://localhost:8080/api/logs
 ```
 Logs are also persisted to `save.log` and `search.log` in the project root.
+
