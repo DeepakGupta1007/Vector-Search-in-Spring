@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Search Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-bg: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #eef2f6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            padding: 2rem 0;
+            text-align: center;
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 1rem;
+            justify-content: center;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            flex: 1;
+            min-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
+            background: #f8fafc;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+            background: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #results-area {
+            margin-top: 1rem;
+        }
+
+        .result-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            border-left: 4px solid #764ba2;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .result-score {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Semantic Search</h1>
+        <div class="subtitle">Powered by Spring AI & Qdrant</div>
+    </header>
+
+    <main>
+        <!-- Save Section -->
+        <section class="card">
+            <h2>Add to Knowledge Base</h2>
+            <div class="form-group">
+                <label for="save-userId">User ID</label>
+                <input type="text" id="save-userId" placeholder="e.g., user123" value="user1">
+            </div>
+            <div class="form-group">
+                <label for="save-text">Text Content</label>
+                <textarea id="save-text" rows="5" placeholder="Enter text to index..."></textarea>
+            </div>
+            <button onclick="saveData()">Save Document</button>
+            <div id="save-status" class="status"></div>
+        </section>
+
+        <!-- Search Section -->
+        <section class="card">
+            <h2>Search Engine</h2>
+            <div class="form-group">
+                <label for="search-userId">User ID</label>
+                <input type="text" id="search-userId" placeholder="e.g., user123" value="user1">
+            </div>
+            <div class="form-group">
+                <label for="search-query">Search Query</label>
+                <input type="text" id="search-query" placeholder="Ask a question..." onkeypress="handleEnter(event)">
+            </div>
+            <button onclick="searchData()">Search</button>
+            <div id="results-area"></div>
+        </section>
+    </main>
+
+    <script>
+        const API_BASE = '/api/vector';
+
+        async function saveData() {
+            const userId = document.getElementById('save-userId').value;
+            const text = document.getElementById('save-text').value;
+            const statusEl = document.getElementById('save-status');
+
+            if (!text || !userId) {
+                showStatus(statusEl, 'Please fill in all fields', 'error');
+                return;
+            }
+
+            statusEl.textContent = 'Saving...';
+            statusEl.className = 'status';
+
+            try {
+                const response = await fetch(`${API_BASE}/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, text })
+                });
+
+                if (response.ok) {
+                    showStatus(statusEl, 'Document saved successfully!', 'success');
+                    document.getElementById('save-text').value = '';
+                } else {
+                    showStatus(statusEl, 'Failed to save document.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(statusEl, 'Network error occurred.', 'error');
+            }
+        }
+
+        async function searchData() {
+            const userId = document.getElementById('search-userId').value;
+            const query = document.getElementById('search-query').value;
+            const resultsArea = document.getElementById('results-area');
+
+            if (!query || !userId) {
+                resultsArea.innerHTML = '<div class="status error">Please fill in all fields</div>';
+                return;
+            }
+
+            resultsArea.innerHTML = '<div class="status">Searching...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, query })
+                });
+
+                if (response.ok) {
+                    const results = await response.json();
+                    displayResults(results);
+                } else {
+                    resultsArea.innerHTML = '<div class="status error">Search failed.</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultsArea.innerHTML = '<div class="status error">Network error.</div>';
+            }
+        }
+
+        function displayResults(results) {
+            const resultsArea = document.getElementById('results-area');
+            if (results.length === 0) {
+                resultsArea.innerHTML = '<div class="status">No matching results found.</div>';
+                return;
+            }
+
+            let html = '';
+            results.forEach(item => {
+                // Determine confidence level color
+                // item.score is expected from backend
+                 const scorePct = (item.score * 100).toFixed(1);
+                 
+                html += `
+                    <div class="result-item">
+                        <div class="result-text">${escapeHtml(item.text)}</div>
+                        <div class="result-score">
+                            <span>Relevance</span>
+                            <span>${scorePct}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+            resultsArea.innerHTML = html;
+        }
+
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = `status ${type}`;
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = 'status';
+            }, 3000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                searchData();
+            }
+        }
+    </script>
+</body>
+</html>
